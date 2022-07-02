@@ -1,0 +1,49 @@
+# Basic Exploratory Queries ##################
+
+#Created a new table "exploratory" to performed basic analysis
+CREATE TABLE IF NOT EXISTS exploratory(
+listing_id INT PRIMARY KEY,
+listing_url LONGTEXT,
+host_id INT,
+host_is_superhost CHAR(1), ####
+room_type VARCHAR(100),
+accommodates VARCHAR(100),
+beds INT,
+minimum_nights INT,
+maximum_nights INT,
+review_scores_rating decimal(3,2),
+location_id INT,
+neighbourhood_group_cleansed VARCHAR(100),
+neighbourhood_cleansed VARCHAR(100),
+price VARCHAR(100)
+);
+
+
+INSERT INTO exploratory(listing_id, listing_url, host_id, host_is_superhost, room_type, accommodates, beds, minimum_nights, maximum_nights, review_scores_rating, location_id, neighbourhood_group_cleansed, neighbourhood_cleansed, price)
+select listing.listing_id, listing.listing_url, listing.host_id, host.host_is_superhost, specification.room_type, specification.accommodates, specification.beds, listing.minimum_nights, listing.maximum_nights, review.review_scores_rating, listing.location_id, location.neighbourhood_group_cleansed, location.neighbourhood_cleansed, listing.price
+from listing
+left join specification # left join
+on listing.listing_id = specification.listing_id
+left join review # left join
+on listing.listing_id = review.listing_id
+left join host # left join
+on listing.host_id = host.host_id
+left join location #left join
+on listing.location_id = location.location_id;
+
+
+select *
+from exploratory;
+
+######## Basic Queries that might be relevant to the functionality of our webapp
+select room_type, price, host_is_superhost
+from exploratory
+where neighbourhood_group_cleansed = 'Manhattan';
+
+select room_type, price, host_is_superhost, neighbourhood_cleansed, neighbourhood_group_cleansed
+from exploratory
+where accommodates = 2 and beds = 1;
+
+select listing_id, host_id, room_type, minimum_nights, neighbourhood_group_cleansed, neighbourhood_cleansed, review_scores_rating, price
+from exploratory
+where review_scores_rating > 4.70;
